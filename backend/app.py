@@ -13,10 +13,6 @@ app = Flask(__name__)
 
 
 # Define and init bunch of stuff
-class LoginForm(FlaskForm) :
-    upload_csv = FileField('File', validators=[DataRequired()])
-    submit = SubmitField("Submit")
-
 
 class CustomChatBot(ChatBot):
     def __init__(self, *args, **kwargs):
