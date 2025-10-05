@@ -18,20 +18,7 @@ app = Flask(__name__)
 ## Declare ALL constants and hyper parameters
 MODEL_PATH = 'models/stacking_model.pkl'
 EXPECTED_FEATURES = ["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce","koi_disposition"]
-
-
-
-
-
-
-#Load and init Nasa Kepler model 
-try:
-    with open(MODEL_PATH, 'rb') as f:
-        model = pickle.load(f)
-    print(f"Model loaded from {MODEL_PATH}")
-except Exception as e:
-    print(f"Error loading model: {e}")
-
+NASA_DEFAULT_DATA_PATH=
 
 
 
@@ -65,6 +52,37 @@ openai_apikey = 'sk-hDP__feS0PsrXdy22ncweQ' #use dotenv .env
 client = OpenAI(api_key=openai_apikey)
 movie_bot = CustomChatBot('MovieBot')
 
+
+
+class KeplerModel():
+    def __init__(self, *args, **kwargs):
+        #Load and init Nasa Kepler model 
+        
+        self.csv:pd.DataFrame = [] # initialise with empty or other deault dataset
+        with os.open(NASA_DEFAULT_DATA_PATH,) as f :
+            csv_data = f.read().decode('utf-8')
+            self.csv = pd.read_csv(io.StringIO(csv_data))
+
+        with open(MODEL_PATH, 'rb') as f:
+            self.model = pickle.load(f)
+        
+    
+    def predict(self) :
+
+        X = self.csv[EXPECTED_FEATURES] if all(col in self.csv.columns for col in EXPECTED_FEATURES) else self.csv
+        X = X.fillna(X.median())
+
+        predictions = self.model.predict(X)
+        probabilities = self.model.predict_proba(X)
+
+        return
+    
+    def update_csv(self,file):
+        csv_data = file.read().decode('utf-8')
+        csv = pd.read_csv(io.StringIO(csv_data))
+        return
+
+kepler_model = KeplerModel()
 
 
 #Helper fucntions definitions
@@ -137,23 +155,11 @@ def get_bot_response():
 def kepler_predict():
     # just call model and save results in object
 
-
-    # read csv as dataframe
-    csv_data = file.read().decode('utf-8')
-    df = pd.read_csv(io.StringIO(csv_data))
-
-    #check for NA / preprocess
-
-    X = df[EXPECTED_FEATURES] if all(col in df.columns for col in EXPECTED_FEATURES) else df
-    X = X.fillna(X.median())
     
-    # run inference model 
-    predictions = model.predict(X)
-    probabilities = model.predict_proba(X)
 
     #save result so that it can be read later by route /exoplanets
 
-    return {"ok":True, "code":200 } #status of request
+    return jsonify({"ok":True, "code":200 }) #status of request
 
 
 
