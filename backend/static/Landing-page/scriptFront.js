@@ -69,7 +69,7 @@ quickBtn.onclick = () => {
   landingHero.style.display = "none";
   uploadSection.style.display = "none";
   // Redirect to Flask loading route and pass dataset info
-  window.location.href = "/loading?dataset=default";
+  window.location.href = "/validate_csv?dataset=default";
 };
 
 // --- Drag & Drop and File Upload ---
@@ -174,14 +174,14 @@ function showCustomBtnPreview(csvText) {
       new Blob([csvText], { type: "text/csv" }),
       "data.csv"
     );
-    fetch("/loading", {
+    fetch("/validate_csv", {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          window.location.href = "/loading?dataset=custom";
+          window.location.href = "/validate_csv?dataset=custom";
         } else {
           alert("CSV columns do not match expected format.");
         }
@@ -201,7 +201,7 @@ function showNextBtn() {
 nextBtn.onclick = function () {
   // If using the default dataset, skip validation and go to loading
   if (selectedDataset === "default") {
-    window.location.href = "/loading?dataset=default";
+    window.location.href = "/validate_csv?dataset=default";
     return;
   }
   // For custom CSV, validate columns before proceeding
@@ -212,14 +212,14 @@ nextBtn.onclick = function () {
     "data.csv"
   );
 
-  fetch("/loading", {
+  fetch("/validate_csv", {
     method: "POST",
     body: formData,
   })
     .then((response) => response.json())
     .then((data) => {
       if (data.success) {
-        window.location.href = "/loading?dataset=custom";
+        window.location.href = "/validate_csv?dataset=custom";
       } else {
         alert("CSV columns do not match expected format.");
       }
