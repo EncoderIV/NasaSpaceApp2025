@@ -9,6 +9,8 @@ from openai import OpenAI
 import pickle
 import io
 import os
+from werkzeug.utils import secure_filename
+
 
 #init the app
 app = Flask(__name__)
@@ -74,6 +76,8 @@ movie_bot = CustomChatBot('MovieBot')
 
 
 
+#Helper fucntions definitions
+
 # Landing page pre validation
 def validate_csv(file):
         
@@ -92,6 +96,20 @@ def validate_csv(file):
     return True
 
 
+#FOr file upload
+def get_session_upload_folder():
+    session_id = session.get('session_id')
+    folder = os.path.join('/tmp/uploads', session_id)
+    os.makedirs(folder, exist_ok=True)
+    return folder
+
+
+def read_file(filename):
+    folder = get_session_upload_folder()
+    filepath = os.path.join(folder, secure_filename(filename))
+    with open(filepath, 'r') as f:
+        content = f.read()
+    return content
 
 
 
@@ -112,6 +130,14 @@ def loading():
    # run_training_or_prediction()
     # When done, redirect to /simulation
     #return redirect(url_for(''))
+
+
+    file = request.files['file']
+    filename = secure_filename(file.filename)
+    folder = get_session_upload_folder()
+    filepath = os.path.join(folder, filename)
+    file.save(filepath)
+
     if "file" not in request.files:
         print("cat1")
         return jsonify({"success": False, "message": "No file uploaded"})
