@@ -10,6 +10,7 @@ import io
 import os
 from werkzeug.utils import secure_filename
 import time
+import math
 
 
 #init the app
@@ -18,7 +19,8 @@ app = Flask(__name__)
 
 ## Declare ALL constants and hyper parameters
 MODEL_PATH = 'models/stacking_model.pkl' # use absolute path
-EXPECTED_FEATURES = ["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce","koi_disposition"]
+EXPECTED_FEATURES = ["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce"]
+#print(len(EXPECTED_FEATURES))
 NASA_DEFAULT_DATA_PATH="static/ml/nasa_default.csv" # use absolute path
 
 
@@ -56,10 +58,107 @@ movie_bot = CustomChatBot('MovieBot')
 
 
 class KeplerModel():
+
+    def latest_run_to_json(self):
+        # Only use confirmed exoplanets (self.latest_run)
+        if not hasattr(self, 'latest_run') or not self.latest_run:
+            return {}
+
+        G = 6.67430e-11  # m^3 kg^-1 s^-2
+        M_sun = 1.98847e30  # kg
+        R_sun = 6.957e8  # m
+        SECONDS_PER_DAY = 86400
+
+        result = {}
+        for row in self.latest_run:
+            # Use KOI name or fallback to index
+            name = row.get('kepoi_name') or row.get('kepid') or row.get('rowid') or f"KOI_{row.get('koi_name', 'unknown')}"
+
+            # 1. Semi-major axis (a) in AU
+            koi_period = float(row.get('koi_period', 0))  # days
+            koi_steff = float(row.get('koi_steff', 5778))  # K
+            koi_srad = float(row.get('koi_srad', 1))  # in solar radii
+            koi_slogg = float(row.get('koi_slogg', 4.44))  # log10(cm/s^2)
+            # Estimate stellar mass from logg and radius: M = g R^2 / G
+            # logg is in cgs, so convert to m/s^2: g = 10**logg / 100
+            g = 10 ** koi_slogg / 100.0
+            R_star_m = koi_srad * R_sun
+            M_star_kg = g * R_star_m**2 / G
+            M_star_sun = M_star_kg / M_sun
+            # Kepler's 3rd law (in AU): a = (P/365.25)^(2/3) * (M_star/M_sun)^(1/3)
+            a = (abs(koi_period) / 365.25) ** (2/3) * (M_star_sun) ** (1/3) if koi_period > 0 else 1
+
+            # 2. Eccentricity (e) - not directly available, set to 0 or estimate if possible
+            e = float(row.get('koi_eccen', 0)) if 'koi_eccen' in row else 0.0
+
+            # 3. Inclination (inc)
+            koi_impact = float(row.get('koi_impact', 0))
+            inc = None
+            if a and koi_srad:
+                try:
+                    cosi = (koi_impact * koi_srad) / a
+                    inc = math.degrees(math.acos(min(1, max(-1, cosi))))
+                except Exception:
+                    inc = 90.0
+            else:
+                inc = 90.0
+
+            # 4. Node and Periapsis (not available, set to 0)
+            node = 0.0
+            peri = 90.0
+
+            # 5. Mean anomaly (ma)
+            koi_time0bk = float(row.get('koi_time0bk', 0))
+            epoch = koi_time0bk
+            ma = 0.0  # Could be calculated for a given epoch, but set to 0 for now
+
+            # Extra params
+            diameter = float(row.get('koi_prad', 1)) * 12742 / 2  # Earth radii to km (Earth diameter = 12742 km)
+            risk = False
+            impact = ""
+            vel = 20.0
+            years = 2025 # curernt year ?
+            ip_max = 0.0
+            ps_max = -5.0
+            ts = 0
+            ip_cum = 0.0
+            ps_cum = -5.0
+            obj_class = row.get('koi_disposition', 'CANDIDATE')
+            obj_type = 'Exoplanet'
+
+            result[name] = {
+                "orbitParams": {
+                    "epoch": epoch,
+                    "a": a,
+                    "e": e,
+                    "inc": inc,
+                    "node": node,
+                    "peri": peri,
+                    "ma": ma
+                },
+                "extraParams": {
+                    "risk": risk,
+                    "diameter": diameter,
+                    "diameter_based_on_magnitude": True,
+                    "impact": impact,
+                    "IP max": ip_max,
+                    "PS max": ps_max,
+                    "TS": ts,
+                    "vel": vel,
+                    "years": years,
+                    "IP cum": ip_cum,
+                    "PS cum": ps_cum,
+                    "class": obj_class,
+                    "type": obj_type
+                }
+            }
+        return result
+    
+
     def __init__(self, *args, **kwargs):
         #Load and init Nasa Kepler model 
         
-
+        self.latest_run:pd.DataFrame
         self.csv:pd.DataFrame = [] # initialise with empty or other default dataset
         #print(os.getpwd())
         with open(NASA_DEFAULT_DATA_PATH, 'r', encoding='utf-8') as f:
@@ -206,7 +305,9 @@ def get_exoplanets():
     result_to_jsonify = kepler_model.latest_run_to_json()
 
 
-    return jsonify({
+    return jsonify(result_to_jsonify)
+    """
+    jsonify({
         "(2023 VD3)": {
             "orbitParams": {
                 "epoch": 60600,
@@ -260,6 +361,7 @@ def get_exoplanets():
             }
         }
     })
+    """
 
 
 @app.route("/loading")
