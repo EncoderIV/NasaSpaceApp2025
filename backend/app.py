@@ -1,6 +1,21 @@
 from flask import Flask,  render_template
+from wtforms.validators import DataRequired
+from wtforms import FileField, SubmitField
+from flask_wtf import FlaskForm
 
+#init the app
 app = Flask(__name__)
+
+
+
+# Define the forms
+class LoginForm(FlaskForm) :
+    upload_csv = FileField('File', validators=[DataRequired()])
+    submit = SubmitField("Submit")
+
+
+
+#Define Routes
 
 @app.route("/")
 def hello_world():
