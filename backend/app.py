@@ -75,7 +75,7 @@ class KeplerModel():
         predictions = self.model.predict(X)
         probabilities = self.model.predict_proba(X)
 
-        return
+        return predictions , probabilities
     
     def update_csv(self,file):
         csv_data = file.read().decode('utf-8')
