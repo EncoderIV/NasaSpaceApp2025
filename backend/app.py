@@ -5,3 +5,7 @@ app = Flask(__name__)
 @app.route("/")
 def hello_world():
     return render_template( "orrery.html" )
+
+@app.route("/")
+def Landing_pagefunction():
+    return render_template( "index.html" )

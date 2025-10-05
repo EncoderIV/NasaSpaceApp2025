@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <title>Exoplanet Data Explorer</title>
-    <link rel="stylesheet" href="StyleFront.css" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='Landing-page/StyleFront.css') }}" />
   </head>
   <body>
     <div class="container">
@@ -35,6 +35,6 @@
         <em>If no CSV is uploaded, default exoplanet data will be used.</em>
       </div>
     </div>
-    <script src="scriptFront.js"></script>
+    <script src="{{ url_for('static', filename='Landing-page/scriptFront.js') }}"></script>
   </body>
 </html>
