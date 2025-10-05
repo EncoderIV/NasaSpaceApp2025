@@ -17,9 +17,9 @@ app = Flask(__name__)
 
 
 ## Declare ALL constants and hyper parameters
-MODEL_PATH = 'models/stacking_model.pkl'
+MODEL_PATH = 'models/stacking_model.pkl' # use absolute path
 EXPECTED_FEATURES = ["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce","koi_disposition"]
-NASA_DEFAULT_DATA_PATH="static/ml/nasa_default.csv"
+NASA_DEFAULT_DATA_PATH="static/ml/nasa_default.csv" # use absolute path
 
 
 
@@ -69,15 +69,28 @@ class KeplerModel():
             self.model = pickle.load(f)
         
     
-    def predict(self) :
-
+    def predict(self):
         X = self.csv[EXPECTED_FEATURES] if all(col in self.csv.columns for col in EXPECTED_FEATURES) else self.csv
         X = X.fillna(X.median())
 
         predictions = self.model.predict(X)
         probabilities = self.model.predict_proba(X)
 
-        return predictions , probabilities
+        # Add predictions and probabilities to the DataFrame
+        df = self.csv.copy()
+        df['prediction'] = predictions
+        if probabilities.shape[1] > 1:
+            df['prob_exoplanet'] = probabilities[:, 1]
+        else:
+            df['prob_exoplanet'] = probabilities[:, 0]
+
+        # Split into two lists based on koi_disposition (1 = exoplanet, 0 = not)
+        is_exploplanets = df[df['prediction'] == 1].to_dict(orient='records')
+        is_not_exploplanets = df[df['prediction'] == 0].to_dict(orient='records')
+
+        self.latest_run = is_exploplanets
+
+        return is_exploplanets, is_not_exploplanets
     
     def update_csv(self,file):
         csv_data = file.read().decode('utf-8')
@@ -163,8 +176,8 @@ def get_bot_response():
 def kepler_predict():
     # just call model and save results in object
 
-    time.sleep(20)
-    #kepler_model.predict()   
+    #time.sleep(20)
+    kepler_model.predict()   
     #save result so that it can be read later by route /exoplanets
     #shoudl save them inside the kepler_model_obj
 
@@ -190,7 +203,8 @@ def simulation():
 def get_exoplanets():
 
     #read result from models and convert  planets info in json following format beloew
-    #result_to_jsonify = kepler_model.latest_run_result()
+    result_to_jsonify = kepler_model.latest_run_to_json()
+
 
     return jsonify({
         "(2023 VD3)": {
