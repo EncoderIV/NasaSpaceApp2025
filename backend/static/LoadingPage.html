@@ -63,14 +63,17 @@
         position: relative;
         z-index: 2;
         margin-top: 60px;
-        animation: bob 2s infinite alternate;
         width: 220px;
         height: auto;
         display: block;
+        transform: rotate(270deg);
+        transform-origin: center;
+        animation: bob 2s infinite alternate;
       }
+
       @keyframes bob {
         to {
-          transform: translateY(-16px);
+          transform: rotate(270deg) translateY(-16px);
         }
       }
       .loading-text {
@@ -116,55 +119,11 @@
       ></div>
       <!-- ...add more asteroids for effect... -->
     </div>
-    <!-- Spaceship SVG (replace with custom or animated SVG as desired) -->
-    <svg
-      class="spaceship"
-      viewBox="0 0 220 80"
-      fill="none"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <ellipse cx="110" cy="65" rx="70" ry="12" fill="#22214f" opacity="0.2" />
-      <rect
-        x="60"
-        y="30"
-        width="100"
-        height="26"
-        rx="13"
-        fill="#7fd0ff"
-        stroke="#b892ff"
-        stroke-width="5"
-      />
-      <ellipse
-        cx="110"
-        cy="43"
-        rx="36"
-        ry="18"
-        fill="#22214f"
-        stroke="#7fd0ff"
-        stroke-width="4"
-      />
-      <rect
-        x="98"
-        y="16"
-        width="24"
-        height="32"
-        rx="12"
-        fill="#b892ff"
-        stroke="#7fd0ff"
-        stroke-width="3"
-      />
-      <ellipse cx="110" cy="21" rx="10" ry="4" fill="#aebaff" />
-      <!-- Rocket flames -->
-      <ellipse cx="110" cy="75" rx="8" ry="5" fill="#aebaff" opacity="0.7" />
-      <ellipse cx="110" cy="80" rx="5" ry="2" fill="#7fd0ff" opacity="0.5" />
-      <!-- Windows -->
-      <ellipse cx="100" cy="38" rx="5" ry="5" fill="#7fd0ff" opacity="0.6" />
-      <ellipse cx="120" cy="38" rx="5" ry="5" fill="#7fd0ff" opacity="0.6" />
-    </svg>
+    <img src="rocket.png" class="spaceship" alt="Rocket" />
     <div class="loading-text">
       <strong>Preparing your simulation...</strong><br />
-      The ship is crossing the asteroid belt. Please wait while we train your
-      model!
+      The ship is crossing the asteroid belt. Please wait while we reach our
+      destination!
     </div>
     <script>
       // Poll the server for training status
