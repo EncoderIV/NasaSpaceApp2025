@@ -131,20 +131,5 @@
       The ship is crossing the asteroid belt. Please wait while we reach our
       destination!
     </div>
-    <script>
-      // Poll the server for training status
-      function checkStatus() {
-        fetch("/training-status")
-          .then((res) => res.json())
-          .then((data) => {
-            if (data.done) {
-              window.location.href = "/simulation";
-            } else {
-              setTimeout(checkStatus, 2000);
-            }
-          });
-      }
-      checkStatus();
-    </script>
   </body>
 </html>
