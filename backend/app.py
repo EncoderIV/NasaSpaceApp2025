@@ -9,6 +9,7 @@ import pickle
 import io
 import os
 from werkzeug.utils import secure_filename
+import time
 
 
 #init the app
@@ -156,7 +157,8 @@ def get_bot_response():
 def kepler_predict():
     # just call model and save results in object
 
-    
+    #just to test loading page
+    time.sleep(20)    
 
     #save result so that it can be read later by route /exoplanets
 

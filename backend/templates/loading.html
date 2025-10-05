@@ -95,10 +95,10 @@
 
   <script>
     function navigate() {
-      window.location.href = 'replace_with_url_for_orrery';  // redirect to Orrery Simulation when  done!
+      window.location.href = " {{ url_for('simulation')}} ";  // redirect to Orrery Simulation when  done!
     }
 
-    fetch('Replace_with_url_for_calling_model') // tell model to start  running inference on CSV
+    fetch("{{ url_for('kepler_predict') }}") // tell model to start  running inference on CSV
       .then(navigate) // Onlyy once it finishes then navigate to the  
       .catch(error => console.log(error)); // log any error in Front end console
   </script>
@@ -125,7 +125,7 @@
       <div class="asteroid" style="top: 60%; left: 80%; animation-delay: 6s"></div>
       <!-- ...add more asteroids for effect... -->
     </div>
-    <img src="{{ urlf_for('static', filename='Loading-page/rocket.png') }} " class="spaceship" alt="Rocket" />
+    <img src="{{ url_for('static', filename='Loading-page/rocket.png') }} " class="spaceship" alt="Rocket" />
     <div class="loading-text">
       <strong>Preparing your simulation...</strong><br />
       The ship is crossing the asteroid belt. Please wait while we reach our
