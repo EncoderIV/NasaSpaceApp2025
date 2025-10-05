@@ -2,11 +2,12 @@ to get the app running
 
 assuming u're in root folder of the project
 
-create virtual envrionement
+create and activate virtual envrionement
 
 cd into this folder
 
 pip install -r requirements.txt
+python -m spacy download en_core_web_sm
 
 then launch app using
 

@@ -98,12 +98,10 @@
                 <input type="checkbox" name="planets" value="Planet">
                 Planets
             </label><br>
-
             <label>
                 <input type="checkbox" name="dwarf planets" value="Dwarf planet">
                 Dwarf planets
             </label><br>
-            
             <label>
                 <input type="checkbox" name="neos" value="NEO">
                 Near-Earth objects
@@ -130,7 +128,6 @@
                     <div class="output" id="e-upper-value">100</div>
                 </div>
             </dev><br>
-
             <label>
                 <input type="checkbox" name="showers" value="Shower">
                 Meteor showers and parent bodies
@@ -141,6 +138,41 @@
             </label>
         </form>
     </div>
+
+    <!-- Chatbot Panel -->
+    <div id="chat-container">
+        <div id="chat-box">
+            <div id="chat-display"></div>
+        </div>
+        <input type="text" id="user-input" placeholder="Type your message...and please wait while GPT is responding..">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userMessage = document.getElementById("user-input").value;
+            document.getElementById("user-input").value = "";
+
+            var chatDisplay = document.getElementById("chat-display");
+            chatDisplay.innerHTML += "<p><b>User:</b> " + userMessage + "</p>";
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+            // Make an AJAX request to the Flask app
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/get?msg=" + encodeURIComponent(userMessage), true);
+            xhr.onload = function () {
+                chatDisplay.innerHTML += "<p><b>Bot:</b> " + xhr.responseText + "</p>";
+                chatDisplay.scrollTop = chatDisplay.scrollHeight;
+            };
+            xhr.send();
+        }
+        // Allow Enter key to send message
+        document.getElementById("user-input").addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
 
 
     <script src="{{ url_for('static', filename='TimeUtils.js') }}"></script>

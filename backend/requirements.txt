@@ -1,1 +1,4 @@
 Flask
+openai
+chatterbot_corpus
+chatterbot
