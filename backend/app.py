@@ -6,6 +6,6 @@ app = Flask(__name__)
 def hello_world():
     return render_template( "orrery.html" )
 
-@app.route("/")
+@app.route("/home")
 def Landing_pagefunction():
     return render_template( "index.html" )
