@@ -18,7 +18,7 @@ app = Flask(__name__)
 ## Declare ALL constants and hyper parameters
 MODEL_PATH = 'models/stacking_model.pkl'
 EXPECTED_FEATURES = ["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce","koi_disposition"]
-NASA_DEFAULT_DATA_PATH=
+NASA_DEFAULT_DATA_PATH="q"
 
 
 
@@ -134,12 +134,13 @@ def loading():
 
 
     # Run validation
-    if validate_csv(file):
+    if validate_csv(file) ==  False :
         print("cat3")
-        return jsonify({"success": True, "message": "CSV validated successfully"})
-    else:
-        print("cat4")
         return jsonify({"success": False, "message": "CSV validation failed"})
+    
+    kepler_model.update_csv(file)
+    
+    return jsonify({"success": True, "message": "CSV validated successfully"})
 
 
 
