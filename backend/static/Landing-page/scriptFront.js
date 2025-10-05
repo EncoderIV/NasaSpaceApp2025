@@ -68,7 +68,6 @@ exploreBtn.onclick = () => {
 quickBtn.onclick = () => {
   landingHero.style.display = "none";
   uploadSection.style.display = "none";
-  // Redirect to Flask loading route and pass dataset info
   window.location.href = "/loading?dataset=default";
 };
 
@@ -143,7 +142,7 @@ function showDefaultBtn() {
 // --- Show custom data button and preview ---
 function showCustomBtnPreview(csvText) {
   const data = parseCSV(csvText);
-  let previewHtml = "<table><thead><tr>";
+  let previewHtml = '<div class="preview-table-area"><table><thead><tr>';
   data[0].forEach((header) => (previewHtml += `<th>${header}</th>`));
   previewHtml += "</tr></thead><tbody>";
   for (let i = 1; i < Math.min(data.length, 4); ++i) {
@@ -151,11 +150,11 @@ function showCustomBtnPreview(csvText) {
     data[i].forEach((cell) => (previewHtml += `<td>${cell}</td>`));
     previewHtml += "</tr>";
   }
-  previewHtml += "</tbody></table>";
+  previewHtml += "</tbody></table></div>";
   btnArea.innerHTML = `
     <div>Preview of CSV:</div>
     ${previewHtml}
-    <button id="use-custom">Use Custom CSV Data</button>
+    <button id="use-custom" class="hero-btn preview-btn">Show full CSV table</button>
   `;
   document.getElementById("use-custom").onclick = () => {
     selectedDataset = "custom";
@@ -172,11 +171,15 @@ function showNextBtn() {
 }
 
 // --- Next button logic ---
+// This version uses the function from your collaborator
 nextBtn.onclick = function () {
-  // Redirect to Flask loading route and pass dataset info
-  /*let datasetParam = selectedDataset === "custom" ? "custom" : "default";
-  window.location.href = "/loading?dataset=" + datasetParam;*/
-  
+  // If using the default dataset, redirect to loading with GET
+  if (selectedDataset === "default") {
+    window.location.href = "/loading?dataset=default";
+    return;
+  }
+  // If custom, upload the file via POST to /loading
+  // This assumes fileInput.files[0] is available and valid
   let formData = new FormData();
   formData.append("file", fileInput.files[0]);
 
@@ -187,14 +190,17 @@ nextBtn.onclick = function () {
     .then(res => res.json())
     .then(data => {
       console.log(data);
-      /*const msg = document.getElementById("error-msg"); do it later
-      if (data.success) {
-        msg.style.color = "green";
-        msg.innerText = data.message;
-      } else {
-        msg.style.color = "red";
-        msg.innerText = data.message;
-      }*/
+      // Optionally show a message to the user
+      // const msg = document.getElementById("error-msg");
+      // if (data.success) {
+      //   msg.style.color = "green";
+      //   msg.innerText = data.message;
+      // } else {
+      //   msg.style.color = "red";
+      //   msg.innerText = data.message;
+      // }
+      // You might want to redirect to simulation here if training is done:
+      // if (data.redirect_url) window.location.href = data.redirect_url;
     })
     .catch(err => {
       console.error(err);
