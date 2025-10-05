@@ -2,8 +2,8 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.124.0/build/three.module.js';
 // import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.114/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/controls/OrbitControls.js';
-import { createOrbit, getOrbitPosition, JulianDateToTrueAnomaly } from 'orbits.js'
-import { JDToMJD, MJDToDatetime, MJDToJD } from 'TimeUtils.js'
+import { createOrbit, getOrbitPosition, JulianDateToTrueAnomaly } from './orbits.js'
+// TimeUtils.js is loaded as a global script in the HTML, so its functions are available globally.
 
 // Constants
 const DEG_TO_RAD = Math.PI / 180;
