@@ -1,4 +1,6 @@
 Flask
 openai
+pandas
+flask_wtf
 chatterbot_corpus
 chatterbot
