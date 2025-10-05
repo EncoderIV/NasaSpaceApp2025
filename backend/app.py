@@ -9,6 +9,7 @@ import pickle
 import io
 import os
 from werkzeug.utils import secure_filename
+import time
 
 
 #init the app
@@ -18,7 +19,7 @@ app = Flask(__name__)
 ## Declare ALL constants and hyper parameters
 MODEL_PATH = 'models/stacking_model.pkl'
 EXPECTED_FEATURES = ["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce","koi_disposition"]
-NASA_DEFAULT_DATA_PATH="q"
+NASA_DEFAULT_DATA_PATH="static/ml/nasa_default.csv"
 
 
 
@@ -58,10 +59,10 @@ class KeplerModel():
     def __init__(self, *args, **kwargs):
         #Load and init Nasa Kepler model 
         
-        self.csv:pd.DataFrame = [] # initialise with empty or other deault dataset
-        with os.open(NASA_DEFAULT_DATA_PATH,) as f :
-            csv_data = f.read().decode('utf-8')
-            self.csv = pd.read_csv(io.StringIO(csv_data))
+
+        self.csv:pd.DataFrame = [] # initialise with empty or other default dataset
+        with open(NASA_DEFAULT_DATA_PATH, 'r', encoding='utf-8') as f:
+            self.csv = pd.read_csv(f)
 
         with open(MODEL_PATH, 'rb') as f:
             self.model = pickle.load(f)
@@ -156,7 +157,8 @@ def get_bot_response():
 def kepler_predict():
     # just call model and save results in object
 
-    
+    #just to test loading page
+    time.sleep(20)    
 
     #save result so that it can be read later by route /exoplanets
 
@@ -166,7 +168,7 @@ def kepler_predict():
 
 #simulation of planets
 @app.route("/simulation")
-def hello_world():
+def simulation():
     return render_template( "orrery.html" )
 
 
@@ -233,3 +235,7 @@ def get_exoplanets():
         }
     })
 
+
+@app.route("/loading")
+def loading_page():
+    return render_template("loading.html" )
