@@ -538,32 +538,43 @@ async function initializePlanets() {
 }
 
 async function initializeNeos() {
-    const neos_json = await readJSON('/static/data/risk_list_neo_data.json');
-    let i = 0;
-    for (const [neoName, neoData] of Object.entries(neos_json)) {
-        const orbitParams = neoData.orbitParams;
-        orbitParams.inc *= DEG_TO_RAD;
-        orbitParams.node *= DEG_TO_RAD;
-        orbitParams.peri *= DEG_TO_RAD;
-        orbitParams.ma *= DEG_TO_RAD;
+    //should wrap all of these  in try catch block cuz wdym app just crashes instantly afterwards 
+    //.then probably better
+    
+    try {
+        const neos_json = await readJSON("/exoplanets");
+ 
+        let i = 0;
+        for (const [neoName, neoData] of Object.entries(neos_json)) {
+            const orbitParams = neoData.orbitParams;
+            orbitParams.inc *= DEG_TO_RAD;
+            orbitParams.node *= DEG_TO_RAD;
+            orbitParams.peri *= DEG_TO_RAD;
+            orbitParams.ma *= DEG_TO_RAD;
 
-        const geometry = new THREE.SphereGeometry(NEO_RADIUS, DEFAULT_MESH_N / 2, DEFAULT_MESH_N / 2);
-        const material = new THREE.MeshBasicMaterial({ color: NEO_COLOR });
-        const neoMesh = new THREE.Mesh(geometry, material);
+            const geometry = new THREE.SphereGeometry(NEO_RADIUS, DEFAULT_MESH_N / 2, DEFAULT_MESH_N / 2);
+            const material = new THREE.MeshBasicMaterial({ color: NEO_COLOR });
+            const neoMesh = new THREE.Mesh(geometry, material);
 
-        const orbit = createOrbit(orbitParams, NEO_ORBIT_COLOR, ORBIT_MESH_POINTS);
-        const pos = getOrbitPosition(orbitParams.a, orbitParams.e, 0, orbitParams.transformMatrix);
-        neoMesh.position.set(pos.x, pos.y, pos.z);
+            const orbit = createOrbit(orbitParams, NEO_ORBIT_COLOR, ORBIT_MESH_POINTS);
+            const pos = getOrbitPosition(orbitParams.a, orbitParams.e, 0, orbitParams.transformMatrix);
+            neoMesh.position.set(pos.x, pos.y, pos.z);
 
-        const body = new Body(neoName, neoData, orbit, neoMesh);
+            const body = new Body(neoName, neoData, orbit, neoMesh);
 
-        orbit.userData.parent = body;
-        neoMesh.userData.parent = body;
-        neos.push(body);
+            orbit.userData.parent = body;
+            neoMesh.userData.parent = body;
+            neos.push(body);
 
-        i += 1;
-        if (i == MAX_VISIBLE_NEOS) { break };
+            i += 1;
+            if (i == MAX_VISIBLE_NEOS) { break };
+        }
+    } catch (error) {
+        console.log("no exoplanets loaded");
+        console.log("Should remove sectino from filterplane"); 
+        //TODO
     }
+
 }
 
 

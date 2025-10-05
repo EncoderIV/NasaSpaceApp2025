@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <script>
+      function navigate() {
+        window.location.href = 'replace_with_url_for_orrery';  // redirect to Orrery Simulation when  done!
+      }
+      
+      fetch('Replace_with_url_for_calling_model') // tell model to start  running inference on CSV
+      .then(navigate) // Onlyy once it finishes then navigate to the  
+      .catch(error => console.log(error)); // log any error in Front end console
+    </script>
+  </head>
+  <body>
+    Loading...  <!-- Display a fancy loading screen -->
+  </body>
+</html>
