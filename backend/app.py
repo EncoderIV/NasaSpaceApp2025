@@ -2,16 +2,16 @@ from flask import Flask,  render_template, request, jsonify,session
 from uuid import uuid4
 from wtforms.validators import DataRequired
 from wtforms import FileField, SubmitField
-from flask_wtf import FlaskForm
+#from flask_wtf import FlaskForm
 import pandas as pd
 from chatterbot import ChatBot
 from openai import OpenAI 
 import pickle
 import io
+import os
 
 #init the app
 app = Flask(__name__)
-
 
 
 ## Declare ALL constants and hyper parameters
@@ -21,9 +21,17 @@ CSV_SAVED_FILES_LOCATION="a"
 
 
 
+#Make session specific for each users to not load bunch of CSV at once
+app.secret_key = 'your_secret_key'
+@app.before_request
+def ensure_session_id():
+    if 'session_id' not in session:
+        session['session_id'] = str(uuid4())
+
+
+
 
 #Load and init Nasa Kepler model 
-
 try:
     with open(MODEL_PATH, 'rb') as f:
         model = pickle.load(f)
