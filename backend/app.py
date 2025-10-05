@@ -218,11 +218,9 @@ def validate_csv(file):
         return False
 
     first_row = df.columns.tolist()
-    for x in first_row:
-        if(x not in EXPECTED_FEATURES):
-            return False
-        
-    return True
+
+    return set(EXPECTED_FEATURES).issubset(set(first_row))
+
 
 
 
@@ -253,7 +251,7 @@ def loading():
 
 
     # Run validation
-    if validate_csv(file) ==  False :
+    if not validate_csv(file) :
         print("cat3")
         return jsonify({"success": False, "message": "CSV validation failed"})
     
