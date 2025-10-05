@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Exoplanet Data Explorer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='Landing-page/StyleFront.css') }}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Exoplanet Discovery</h1>
+      <!-- HERO SECTION: Landing buttons -->
+      <div id="landing-hero">
+        <button id="explore-btn" class="hero-btn">Upload custom dataset</button>
+        <button id="quick-btn" class="hero-btn secondary">
+          Use NASA dataset
+        </button>
+      </div>
+      <!-- UPLOAD SECTION: Hidden until Explore is chosen -->
+      <div id="upload-section" style="display: none">
+        <div id="drop-area" class="drop-area">
+          <p>Drag & drop your <span class="accent">CSV</span> file here</p>
+          <span>or</span>
+          <label class="upload-btn">
+            <input
+              type="file"
+              id="fileElem"
+              accept=".csv"
+              style="display: none"
+            />
+            <span>Browse CSV</span>
+          </label>
+          <div id="error-msg"></div>
+        </div>
+        <div id="file-info"></div>
+        <div id="btn-area"></div>
+        <div id="table-area"></div>
+        <button id="next-btn" style="display: none">Next</button>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='Landing-page/scriptFront.js') }}"></script>
+  </body>
+</html>
