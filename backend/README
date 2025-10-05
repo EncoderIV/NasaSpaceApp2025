@@ -1,0 +1,14 @@
+to get the app running
+
+assuming u're in root folder of the project
+
+create virtual envrionement
+
+cd into this folder
+
+pip install -r requirements.txt
+
+then launch app using
+
+flask run 
+
