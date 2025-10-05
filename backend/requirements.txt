@@ -4,3 +4,4 @@ pandas
 flask_wtf
 chatterbot_corpus
 chatterbot
+scikit-learn
