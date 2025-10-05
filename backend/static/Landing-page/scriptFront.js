@@ -174,8 +174,32 @@ function showNextBtn() {
 // --- Next button logic ---
 nextBtn.onclick = function () {
   // Redirect to Flask loading route and pass dataset info
-  let datasetParam = selectedDataset === "custom" ? "custom" : "default";
-  window.location.href = "/loading?dataset=" + datasetParam;
+  /*let datasetParam = selectedDataset === "custom" ? "custom" : "default";
+  window.location.href = "/loading?dataset=" + datasetParam;*/
+  
+  let formData = new FormData();
+  formData.append("file", fileInput.files[0]);
+
+  fetch("/loading", {
+    method: "POST",
+    body: formData
+  })
+    .then(res => res.json())
+    .then(data => {
+      console.log(data);
+      /*const msg = document.getElementById("error-msg"); do it later
+      if (data.success) {
+        msg.style.color = "green";
+        msg.innerText = data.message;
+      } else {
+        msg.style.color = "red";
+        msg.innerText = data.message;
+      }*/
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("error-msg").innerText = "Upload failed";
+    });
 };
 
 // --- On load: show only landing hero ---
