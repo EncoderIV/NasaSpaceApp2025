@@ -174,13 +174,13 @@ function showCustomBtnPreview(csvText) {
       new Blob([csvText], { type: "text/csv" }),
       "data.csv"
     );
-    fetch("/validate-csv", {
+    fetch("/loading", {
       method: "POST",
       body: formData,
     })
       .then((response) => response.json())
       .then((data) => {
-        if (data.valid) {
+        if (data.success) {
           window.location.href = "/loading?dataset=custom";
         } else {
           alert("CSV columns do not match expected format.");
@@ -212,13 +212,13 @@ nextBtn.onclick = function () {
     "data.csv"
   );
 
-  fetch("/validate-csv", {
+  fetch("/loading", {
     method: "POST",
     body: formData,
   })
     .then((response) => response.json())
     .then((data) => {
-      if (data.valid) {
+      if (data.success) {
         window.location.href = "/loading?dataset=custom";
       } else {
         alert("CSV columns do not match expected format.");
