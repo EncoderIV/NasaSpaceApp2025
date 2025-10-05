@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Exoplanet Data Explorer</title>
+    <link rel="stylesheet" href="StyleFront.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Exoplanet Data Explorer</h1>
+      <div id="drop-area" class="drop-area">
+        <p>Drag & drop your <span class="accent">CSV</span> file here</p>
+        <span>or</span>
+        <label class="upload-btn">
+          <input
+            type="file"
+            id="fileElem"
+            accept=".csv"
+            style="display: none"
+          />
+          <span>Browse CSV</span>
+        </label>
+        <div id="error-msg"></div>
+      </div>
+      <div id="file-info"></div>
+      <div id="btn-area"></div>
+      <div id="table-area"></div>
+      <button id="next-btn" style="display: none">Next</button>
+      <div id="loading-overlay" style="display: none">
+        <div class="loader"></div>
+        <div>Running exoplanet prediction...</div>
+      </div>
+      <div class="default-note">
+        <em>If no CSV is uploaded, default exoplanet data will be used.</em>
+      </div>
+    </div>
+    <script src="scriptFront.js"></script>
+  </body>
+</html>
