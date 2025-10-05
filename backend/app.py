@@ -61,6 +61,7 @@ class KeplerModel():
         
 
         self.csv:pd.DataFrame = [] # initialise with empty or other default dataset
+        #print(os.getpwd())
         with open(NASA_DEFAULT_DATA_PATH, 'r', encoding='utf-8') as f:
             self.csv = pd.read_csv(f)
 
@@ -82,6 +83,12 @@ class KeplerModel():
         csv_data = file.read().decode('utf-8')
         csv = pd.read_csv(io.StringIO(csv_data))
         return
+    
+    def reset_csv(self):
+        self.csv:pd.DataFrame = [] # initialise with empty or other default dataset
+        with open(NASA_DEFAULT_DATA_PATH, 'r', encoding='utf-8') as f:
+            self.csv = pd.read_csv(f)
+        return   
 
 kepler_model = KeplerModel()
 
@@ -104,7 +111,6 @@ def validate_csv(file):
             return False
         
     return True
-
 
 
 
@@ -157,13 +163,21 @@ def get_bot_response():
 def kepler_predict():
     # just call model and save results in object
 
-    #just to test loading page
-    time.sleep(20)    
-
+    time.sleep(20)
+    #kepler_model.predict()   
     #save result so that it can be read later by route /exoplanets
+    #shoudl save them inside the kepler_model_obj
+
 
     return jsonify({"ok":True, "code":200 }) #status of request
 
+@app.route("/use_default_dataset")
+def use_default_dataset():
+
+    kepler_model.reset_csv()
+
+    return jsonify({"ok":True, "message": "it ran without crashing"})
+ #redirect here or front end
 
 
 #simulation of planets
@@ -174,11 +188,9 @@ def simulation():
 
 @app.route("/exoplanets")
 def get_exoplanets():
-    # test for plug and play once model is connected
-    # will just call mdodel or read database here
-    #and format here or before hand
 
-    # Read CSV and converts into JSON
+    #read result from models and convert  planets info in json following format beloew
+    #result_to_jsonify = kepler_model.latest_run_result()
 
     return jsonify({
         "(2023 VD3)": {

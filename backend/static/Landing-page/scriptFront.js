@@ -69,7 +69,14 @@ quickBtn.onclick = () => {
   landingHero.style.display = "none";
   uploadSection.style.display = "none";
   // Redirect to Flask loading route and pass dataset info
-  window.location.href = "/validate_csv?dataset=default";
+  fetch("/use_default_dataset")
+  .then((response) =>{
+    window.location.href = "/loading";
+    
+  })
+  .catch(() => {
+      alert("There was an error on the Server.");
+  });
 };
 
 // --- Drag & Drop and File Upload ---
