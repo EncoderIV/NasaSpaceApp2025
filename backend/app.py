@@ -1,49 +1,22 @@
-from flask import Flask,  render_template
+from flask import Flask,  render_template, request, jsonify
 from wtforms.validators import DataRequired
 from wtforms import FileField, SubmitField
 from flask_wtf import FlaskForm
 from flask import Flask, request, jsonify, render_template
 import pandas as pd
+from chatterbot import ChatBot
+from openai import OpenAI 
 
 #init the app
 app = Flask(__name__)
 
 
 
-# Define the forms
+# Define and init bunch of stuff
 class LoginForm(FlaskForm) :
     upload_csv = FileField('File', validators=[DataRequired()])
     submit = SubmitField("Submit")
 
-
-def vcsvf(file):
-        
-    try:
-        df=pd.read_csv(file,nrows=0)
-    except pd.errors.ParserError:
-        return False
-    except FileNotFoundError:
-        return False
-
-    first_row = df.columns.tolist()
-    words=["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce","koi_disposition"]
-    for x in first_row:
-        if(x not in words):
-            return False
-        
-    return True
-
-
-
-#Define Routes
-
-from flask import Flask,  render_template, request, jsonify
-from chatterbot import ChatBot
-from openai import OpenAI 
-
-
-#initialising stuff
-app = Flask(__name__)
 
 class CustomChatBot(ChatBot):
     def __init__(self, *args, **kwargs):
@@ -69,12 +42,41 @@ class CustomChatBot(ChatBot):
             return "Sorry could not help at the moment. Please try again later."
             
 
-openai_apikey = 'sk-hDP__feS0PsrXdy22ncweQ'
-client = OpenAI(api_key=openai_apikey)
 # Create a new chatbot
+openai_apikey = 'sk-hDP__feS0PsrXdy22ncweQ' #use dotenv .env
+client = OpenAI(api_key=openai_apikey)
 movie_bot = CustomChatBot('MovieBot')
 
+
+
+
+def validate_csv(file):
+        
+    try:
+        df=pd.read_csv(file,nrows=0)
+    except pd.errors.ParserError:
+        return False
+    except FileNotFoundError:
+        return False
+
+    first_row = df.columns.tolist()
+    words=["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce","koi_disposition"]
+    for x in first_row:
+        if(x not in words):
+            return False
+        
+    return True
+
+
+
+
+
+
+
+
 #Defining all routes 
+
+
 @app.route("/")
 def hello_world():
     return render_template( "orrery.html" )
@@ -82,9 +84,6 @@ def hello_world():
 @app.route("/home")
 def Landing_pagefunction():
     return render_template( "index.html" )
-
-
-
 
 
 @app.route('/loading',methods=["POST"])
@@ -105,7 +104,7 @@ def loading():
 
 
     # Run validation
-    if vcsvf(file):
+    if validate_csv(file):
         print("cat3")
         return jsonify({"success": True, "message": "CSV validated successfully"})
     else:
