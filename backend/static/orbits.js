@@ -1,4 +1,4 @@
-import * as THREE from 'https://cdn.skypack.dev/three@0.128.0/build/three.module.js';
+import * as THREE from 'https://cdn.skypack.dev/three@0.124.0/build/three.module.js';
 
 export function createOrbit(orbitParams, color, n_mesh_points) {
     const orbit_segment_const = 2 * Math.PI / n_mesh_points;

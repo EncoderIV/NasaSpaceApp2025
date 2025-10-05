@@ -6,6 +6,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+    <script> 
+        const FLASK_URL_FOR_EXOPLANETS = {{ url_for('get_exoplanets')}}; 
+    </script> <!--Define this dynamic url here, so shared later on with main.js to call proper API -->
 </head>
 <body>
     <canvas id="orreryCanvas"></canvas>
@@ -64,20 +67,30 @@
             <div class="time-item" id="timespeed" style="font-size: large;"></div>
         </div>
         <div class="time-control-panel">
-            <button class="time-control-button" id="fastbackward-button" onmouseover="swapImage(this, '/static/assets/icon-time-fastbackward-hover.png')" onmouseout="swapImage(this, '/static/assets/icon-time-fastbackward.png')">
-                <img src="/static/assets/icon-time-fastbackward.png" alt="" width="198" height="128" class="time-control-icon">
+            <button class="time-control-button" id="fastbackward-button"
+                onmouseover="swapImage(this, '{{ url_for('static', filename='assets/icon-time-fastbackward-hover.png') }}')"
+                onmouseout="swapImage(this, '{{ url_for('static', filename='assets/icon-time-fastbackward.png') }}')">
+                <img src="{{ url_for('static' , filename='assets/icon-time-fastbackward.png') }}" alt="" width="198" height="128" class="time-control-icon">
             </button>
-            <button class="time-control-button" id="backward-button" onmouseover="swapImage(this, '/static/assets/icon-time-backward-hover.png')" onmouseout="swapImage(this, '/static/assets/icon-time-backward.png')">
-                <img src="/static/assets/icon-time-backward.png" alt="" width="128" height="128" class="time-control-icon">
+            <button class="time-control-button" id="backward-button"
+                onmouseover="swapImage(this, '{{ url_for('static', filename='assets/icon-time-backward-hover.png') }}')"
+                onmouseout="swapImage(this, '{{ url_for('static', filename='assets/icon-time-backward.png') }}')">
+                <img src="{{ url_for('static' , filename='assets/icon-time-backward.png')}}" alt="" width="128" height="128" class="time-control-icon">
             </button>
-            <button class="time-control-button" id="now-button" onmouseover="swapImage(this, '/static/assets/icon-time-now-hover.png')" onmouseout="swapImage(this, '/static/assets/icon-time-now.png')">
-                <img src="/static/assets/icon-time-now.png" alt="" width="128" height="128" class="time-control-icon">
+            <button class="time-control-button" id="now-button"
+                onmouseover="swapImage(this, '{{ url_for('static', filename='assets/icon-time-now-hover.png') }}')"
+                onmouseout="swapImage(this, '{{ url_for('static', filename='assets/icon-time-now.png') }}')">
+                <img src="{{ url_for('static' , filename='assets/icon-time-now.png' )}}" alt="" width="128" height="128" class="time-control-icon">
             </button>
-            <button class="time-control-button" id="forward-button" onmouseover="swapImage(this, '/static/assets/icon-time-forward-hover.png')" onmouseout="swapImage(this, '/static/assets/icon-time-forward.png')">
-                <img src="/static/assets/icon-time-forward.png" alt="" width="128" height="128" class="time-control-icon">
+            <button class="time-control-button" id="forward-button"
+                onmouseover="swapImage(this, '{{ url_for('static', filename='assets/icon-time-forward-hover.png') }}')"
+                onmouseout="swapImage(this, '{{ url_for('static', filename='assets/icon-time-forward.png') }}')">
+                <img src="{{ url_for('static', filename='assets/icon-time-forward.png') }} " alt="" width="128" height="128" class="time-control-icon">
             </button>
-            <button class="time-control-button" id="fastforward-button" onmouseover="swapImage(this, '/static/assets/icon-time-fastforward-hover.png')" onmouseout="swapImage(this, '/static/assets/icon-time-fastforward.png')">
-                <img src="/static/assets/icon-time-fastforward.png" alt="" width="198" height="128" class="time-control-icon">
+            <button class="time-control-button" id="fastforward-button"
+                onmouseover="swapImage(this, '{{ url_for('static', filename='assets/icon-time-fastforward-hover.png') }}')"
+                onmouseout="swapImage(this, '{{ url_for('static', filename='assets/icon-time-fastforward.png') }}')">
+                <img src="{{ url_for('static', filename='assets/icon-time-fastforward.png') }} " alt="" width="198" height="128" class="time-control-icon">
             </button>
         </div>
     </div>
@@ -88,12 +101,10 @@
                 <input type="checkbox" name="planets" value="Planet">
                 Planets
             </label><br>
-
             <label>
                 <input type="checkbox" name="dwarf planets" value="Dwarf planet">
                 Dwarf planets
             </label><br>
-            
             <label>
                 <input type="checkbox" name="neos" value="NEO">
                 Near-Earth objects
@@ -120,7 +131,6 @@
                     <div class="output" id="e-upper-value">100</div>
                 </div>
             </dev><br>
-
             <label>
                 <input type="checkbox" name="showers" value="Shower">
                 Meteor showers and parent bodies
@@ -131,6 +141,41 @@
             </label>
         </form>
     </div>
+
+    <!-- Chatbot Panel -->
+    <div id="chat-container">
+        <div id="chat-box">
+            <div id="chat-display"></div>
+        </div>
+        <input type="text" id="user-input" placeholder="Type your message...and please wait while GPT is responding..">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var userMessage = document.getElementById("user-input").value;
+            document.getElementById("user-input").value = "";
+
+            var chatDisplay = document.getElementById("chat-display");
+            chatDisplay.innerHTML += "<p><b>User:</b> " + userMessage + "</p>";
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
+
+            // Make an AJAX request to the Flask app
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", "/get?msg=" + encodeURIComponent(userMessage), true);
+            xhr.onload = function () {
+                chatDisplay.innerHTML += "<p><b>Bot:</b> " + xhr.responseText + "</p>";
+                chatDisplay.scrollTop = chatDisplay.scrollHeight;
+            };
+            xhr.send();
+        }
+        // Allow Enter key to send message
+        document.getElementById("user-input").addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
 
 
     <script src="{{ url_for('static', filename='TimeUtils.js') }}"></script>

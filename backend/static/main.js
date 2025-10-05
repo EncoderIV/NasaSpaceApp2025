@@ -2,8 +2,8 @@
 import * as THREE from 'https://cdn.skypack.dev/three@0.124.0/build/three.module.js';
 // import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.114/examples/jsm/loaders/GLTFLoader.js';
 import { OrbitControls } from 'https://cdn.skypack.dev/three@0.128.0/examples/jsm/controls/OrbitControls.js';
-import { createOrbit, getOrbitPosition, JulianDateToTrueAnomaly } from 'orbits.js'
-import { JDToMJD, MJDToDatetime, MJDToJD } from 'TimeUtils.js'
+import { createOrbit, getOrbitPosition, JulianDateToTrueAnomaly } from './orbits.js'
+// TimeUtils.js is loaded as a global script in the HTML, so its functions are available globally.
 
 // Constants
 const DEG_TO_RAD = Math.PI / 180;
@@ -86,12 +86,12 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 
 // Load skybox texture
 scene.background = new THREE.CubeTextureLoader().load([
-    'assets/px.png', // Right
-    'assets/nx.png', // Left
-    'assets/py.png', // Top
-    'assets/ny.png', // Bottom
-    'assets/pz.png', // Front
-    'assets/nz.png'  // Back
+    '/static/assets/px.png', // Right
+    '/static/assets/nx.png', // Left
+    '/static/assets/py.png', // Top
+    '/static/assets/ny.png', // Bottom
+    '/static/assets/pz.png', // Front
+    '/static/assets/nz.png'  // Back
 ]);
 
 // Add lighting
@@ -464,7 +464,7 @@ async function readJSON(filePath) {
 function addSun() {
     // add Sun Texture
     const sunTextureLoader = new THREE.TextureLoader();
-    const sunTexture = sunTextureLoader.load('assets/body_textures/8k_sun.jpg');
+    const sunTexture = sunTextureLoader.load('/static/assets/body_textures/8k_sun.jpg');
 
     const geometry = new THREE.SphereGeometry(0.02, DEFAULT_MESH_N, DEFAULT_MESH_N);
     const material = new THREE.MeshBasicMaterial({map: sunTexture});
@@ -478,7 +478,7 @@ function addSun() {
 }
 
 async function initializePlanets() {
-    const planets_json = await readJSON('data/planet_data.json');
+    const planets_json = await readJSON('/static/data/planet_data.json');
     for (const [planetName, planetData] of Object.entries(planets_json)) {
         const orbitParams = planetData.orbitParams;
         orbitParams.inc *= DEG_TO_RAD;
@@ -488,7 +488,7 @@ async function initializePlanets() {
         // get planet texture
         const planetTextureName = planetData.renderParams.texture;
         const planetTextureLoader = new THREE.TextureLoader();
-        const planetTexture = planetTextureLoader.load('assets/body_textures/' + planetTextureName);
+    const planetTexture = planetTextureLoader.load('/static/assets/body_textures/' + planetTextureName);
         // check if planet is saturn's rings
         // if so, make it a ring geometry with specified parameters -- otherwise, make it a sphere egeometry
         // console.log(planetName)
@@ -538,40 +538,51 @@ async function initializePlanets() {
 }
 
 async function initializeNeos() {
-    const neos_json = await readJSON('data/risk_list_neo_data.json');
-    let i = 0;
-    for (const [neoName, neoData] of Object.entries(neos_json)) {
-        const orbitParams = neoData.orbitParams;
-        orbitParams.inc *= DEG_TO_RAD;
-        orbitParams.node *= DEG_TO_RAD;
-        orbitParams.peri *= DEG_TO_RAD;
-        orbitParams.ma *= DEG_TO_RAD;
+    //should wrap all of these  in try catch block cuz wdym app just crashes instantly afterwards 
+    //.then probably better
+    
+    try {
+        const neos_json = await readJSON("/exoplanets");
+ 
+        let i = 0;
+        for (const [neoName, neoData] of Object.entries(neos_json)) {
+            const orbitParams = neoData.orbitParams;
+            orbitParams.inc *= DEG_TO_RAD;
+            orbitParams.node *= DEG_TO_RAD;
+            orbitParams.peri *= DEG_TO_RAD;
+            orbitParams.ma *= DEG_TO_RAD;
 
-        const geometry = new THREE.SphereGeometry(NEO_RADIUS, DEFAULT_MESH_N / 2, DEFAULT_MESH_N / 2);
-        const material = new THREE.MeshBasicMaterial({ color: NEO_COLOR });
-        const neoMesh = new THREE.Mesh(geometry, material);
+            const geometry = new THREE.SphereGeometry(NEO_RADIUS, DEFAULT_MESH_N / 2, DEFAULT_MESH_N / 2);
+            const material = new THREE.MeshBasicMaterial({ color: NEO_COLOR });
+            const neoMesh = new THREE.Mesh(geometry, material);
 
-        const orbit = createOrbit(orbitParams, NEO_ORBIT_COLOR, ORBIT_MESH_POINTS);
-        const pos = getOrbitPosition(orbitParams.a, orbitParams.e, 0, orbitParams.transformMatrix);
-        neoMesh.position.set(pos.x, pos.y, pos.z);
+            const orbit = createOrbit(orbitParams, NEO_ORBIT_COLOR, ORBIT_MESH_POINTS);
+            const pos = getOrbitPosition(orbitParams.a, orbitParams.e, 0, orbitParams.transformMatrix);
+            neoMesh.position.set(pos.x, pos.y, pos.z);
 
-        const body = new Body(neoName, neoData, orbit, neoMesh);
+            const body = new Body(neoName, neoData, orbit, neoMesh);
 
-        orbit.userData.parent = body;
-        neoMesh.userData.parent = body;
-        neos.push(body);
+            orbit.userData.parent = body;
+            neoMesh.userData.parent = body;
+            neos.push(body);
 
-        i += 1;
-        if (i == MAX_VISIBLE_NEOS) { break };
+            i += 1;
+            if (i == MAX_VISIBLE_NEOS) { break };
+        }
+    } catch (error) {
+        console.log("no exoplanets loaded");
+        console.log("Should remove sectino from filterplane"); 
+        //TODO
     }
+
 }
 
 
 // Store parent body positions and orbits for animation
 
 async function initializeShowers() {
-    const showers_json = await readJSON('data/stream_dataIAU2022.json');
-    const parentBodies_json = await readJSON('data/stream_parentbody.json');
+    const showers_json = await readJSON('/static/data/stream_dataIAU2022.json');
+    const parentBodies_json = await readJSON('/static/data/stream_parentbody.json');
     const parentBodies = Object.entries(parentBodies_json);
     
     let visibleShowersCount = 0; // Counter to limit the number of visible showers
