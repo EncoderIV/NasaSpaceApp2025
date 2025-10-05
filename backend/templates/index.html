@@ -8,31 +8,34 @@
   </head>
   <body>
     <div class="container">
-      <h1>Exoplanet Data Explorer</h1>
-      <div id="drop-area" class="drop-area">
-        <p>Drag & drop your <span class="accent">CSV</span> file here</p>
-        <span>or</span>
-        <label class="upload-btn">
-          <input
-            type="file"
-            id="fileElem"
-            accept=".csv"
-            style="display: none"
-          />
-          <span>Browse CSV</span>
-        </label>
-        <div id="error-msg"></div>
+      <h1>Exoplanet Discovery</h1>
+      <!-- HERO SECTION: Landing buttons -->
+      <div id="landing-hero">
+        <button id="explore-btn" class="hero-btn">Upload custom dataset</button>
+        <button id="quick-btn" class="hero-btn secondary">
+          Use NASA dataset
+        </button>
       </div>
-      <div id="file-info"></div>
-      <div id="btn-area"></div>
-      <div id="table-area"></div>
-      <button id="next-btn" style="display: none">Next</button>
-      <div id="loading-overlay" style="display: none">
-        <div class="loader"></div>
-        <div>Running exoplanet prediction...</div>
-      </div>
-      <div class="default-note">
-        <em>If no CSV is uploaded, default exoplanet data will be used.</em>
+      <!-- UPLOAD SECTION: Hidden until Explore is chosen -->
+      <div id="upload-section" style="display: none">
+        <div id="drop-area" class="drop-area">
+          <p>Drag & drop your <span class="accent">CSV</span> file here</p>
+          <span>or</span>
+          <label class="upload-btn">
+            <input
+              type="file"
+              id="fileElem"
+              accept=".csv"
+              style="display: none"
+            />
+            <span>Browse CSV</span>
+          </label>
+          <div id="error-msg"></div>
+        </div>
+        <div id="file-info"></div>
+        <div id="btn-area"></div>
+        <div id="table-area"></div>
+        <button id="next-btn" style="display: none">Next</button>
       </div>
     </div>
     <script src="{{ url_for('static', filename='Landing-page/scriptFront.js') }}"></script>

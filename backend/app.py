@@ -24,3 +24,11 @@ def hello_world():
 @app.route("/home")
 def Landing_pagefunction():
     return render_template( "index.html" )
+
+@app.route('/loading')
+def loading():
+    # Do training/prediction here
+    run_training_or_prediction()
+    # When done, redirect to /simulation
+    return redirect(url_for(''))
+

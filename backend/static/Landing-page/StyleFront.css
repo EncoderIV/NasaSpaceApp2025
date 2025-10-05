@@ -168,3 +168,28 @@ loading-overlay {
     transform: rotate(360deg);
   }
 }
+.hero-btn {
+  font-size: 1.2em;
+  padding: 18px 48px;
+  margin: 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  background: linear-gradient(90deg, #4268a5 60%, #7fe4ff 100%);
+  color: #182a47;
+  font-weight: bold;
+  border: none;
+  box-shadow: 0 2px 16px #232d4b40;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.hero-btn.secondary {
+  background: linear-gradient(90deg, #ffca7f 60%, #fff6e0 100%);
+  color: #182a47;
+}
+.hero-btn:hover {
+  box-shadow: 0 4px 24px #232d4b80;
+  background: linear-gradient(90deg, #4268a5 40%, #ffca7f 100%);
+}
+#landing-hero {
+  margin-top: 48px;
+  margin-bottom: 32px;
+}

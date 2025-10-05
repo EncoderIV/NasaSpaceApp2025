@@ -1,3 +1,4 @@
+// --- Default Exoplanet Data (CSV format) ---
 const defaultCsvData = `Name,Discovery Year,Mass (Jupiter),Radius (Jupiter),Orbital Period (days),Distance (ly)
 Kepler-22b,2011,0.36,2.38,289.9,600
 TRAPPIST-1e,2017,0.692,0.91,6.10,40
@@ -6,6 +7,22 @@ Proxima Centauri b,2016,0.003,0.95,11.186,4.2
 WASP-12b,2008,1.47,1.83,1.09,870
 GJ 1214 b,2009,0.019,2.68,1.58,47
 `;
+
+// --- DOM Elements ---
+const landingHero = document.getElementById("landing-hero");
+const uploadSection = document.getElementById("upload-section");
+const exploreBtn = document.getElementById("explore-btn");
+const quickBtn = document.getElementById("quick-btn");
+const tableArea = document.getElementById("table-area");
+const nextBtn = document.getElementById("next-btn");
+const fileInfo = document.getElementById("file-info");
+const btnArea = document.getElementById("btn-area");
+const errorMsg = document.getElementById("error-msg");
+const dropArea = document.getElementById("drop-area");
+const fileInput = document.getElementById("fileElem");
+
+let selectedDataset = null; // 'default' or 'custom'
+let customCsvText = null;
 
 // --- CSV Parsing ---
 function parseCSV(csvString) {
@@ -38,20 +55,24 @@ function renderTable(data) {
   return html;
 }
 
-// --- UI Logic ---
-const dropArea = document.getElementById("drop-area");
-const fileInput = document.getElementById("fileElem");
-const fileInfo = document.getElementById("file-info");
-const tableArea = document.getElementById("table-area");
-const errorMsg = document.getElementById("error-msg");
-const btnArea = document.getElementById("btn-area");
-const nextBtn = document.getElementById("next-btn");
-const loadingOverlay = document.getElementById("loading-overlay");
+// --- Landing page buttons ---
+exploreBtn.onclick = () => {
+  landingHero.style.display = "none";
+  uploadSection.style.display = "";
+  fileInfo.textContent = "";
+  tableArea.innerHTML = "";
+  btnArea.innerHTML = "";
+  nextBtn.style.display = "none";
+};
 
-let selectedDataset = null; // 'default' or 'custom'
-let customCsvText = null;
+quickBtn.onclick = () => {
+  landingHero.style.display = "none";
+  uploadSection.style.display = "none";
+  // Redirect to Flask loading route and pass dataset info
+  window.location.href = "/loading?dataset=default";
+};
 
-// Prevent default drag behaviors
+// --- Drag & Drop and File Upload ---
 function preventDefaults(e) {
   e.preventDefault();
   e.stopPropagation();
@@ -107,7 +128,7 @@ function handleFiles(e) {
   reader.readAsText(file);
 }
 
-// Show default data button
+// --- Show default data button ---
 function showDefaultBtn() {
   btnArea.innerHTML = `<button id="use-default">Use Default Exoplanet Data</button>`;
   document.getElementById("use-default").onclick = () => {
@@ -119,7 +140,7 @@ function showDefaultBtn() {
   };
 }
 
-// Show custom data button and preview
+// --- Show custom data button and preview ---
 function showCustomBtnPreview(csvText) {
   const data = parseCSV(csvText);
   let previewHtml = "<table><thead><tr>";
@@ -145,29 +166,24 @@ function showCustomBtnPreview(csvText) {
   };
 }
 
-// Show Next button
+// --- Show Next button ---
 function showNextBtn() {
   nextBtn.style.display = "inline-block";
 }
 
-// Next button logic
+// --- Next button logic ---
 nextBtn.onclick = function () {
-  // Show loading overlay
-  loadingOverlay.style.display = "flex";
-  // Simulate ML model call (replace with actual call if needed)
-  setTimeout(() => {
-    loadingOverlay.style.display = "none";
-    // After prediction, show some results (replace with actual results)
-    tableArea.innerHTML =
-      "<h2>Prediction Done!</h2><p>See exoplanet prediction results below.</p>";
-    // Optionally: render prediction results table here
-  }, 3000); // Simulate 3 seconds ML processing
+  // Redirect to Flask loading route and pass dataset info
+  let datasetParam = selectedDataset === "custom" ? "custom" : "default";
+  window.location.href = "/loading?dataset=" + datasetParam;
 };
 
-// On load: show only button to use default
+// --- On load: show only landing hero ---
 window.addEventListener("DOMContentLoaded", () => {
+  landingHero.style.display = "";
+  uploadSection.style.display = "none";
   fileInfo.textContent = "";
   tableArea.innerHTML = "";
-  showDefaultBtn();
+  btnArea.innerHTML = "";
   nextBtn.style.display = "none";
 });
