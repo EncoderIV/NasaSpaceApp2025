@@ -1,5 +1,4 @@
-from flask import Flask,  render_template, request, jsonify,session
-from uuid import uuid4
+from flask import Flask,  render_template, request, jsonify
 from wtforms.validators import DataRequired
 from wtforms import FileField, SubmitField
 #from flask_wtf import FlaskForm
@@ -19,16 +18,8 @@ app = Flask(__name__)
 ## Declare ALL constants and hyper parameters
 MODEL_PATH = 'models/stacking_model.pkl'
 EXPECTED_FEATURES = ["koi_fpflag_nt","koi_fpflag_ss","koi_fpflag_co","koi_fpflag_ec","koi_period","koi_period_err1","koi_period_err2","koi_time0bk","koi_time0bk_err1","koi_time0bk_err2","koi_impact","koi_impact_err1","koi_impact_err2","koi_duration","koi_duration_err1","koi_duration_err2","koi_depth","koi_depth_err1","koi_depth_err2","koi_prad","koi_prad_err1","koi_prad_err2","koi_teq","koi_insol","koi_insol_err1","koi_insol_err2","koi_model_snr","koi_tce_plnt_num","koi_steff","koi_steff_err1","koi_steff_err2","koi_slogg","koi_slogg_err1","koi_slogg_err2","koi_srad","koi_srad_err1","koi_srad_err2","ra","dec","koi_kepmag","koi_tce_delivnameq1_q16_tce","koi_tce_delivnameq1_q17_dr24_tce","koi_tce_delivnameq1_q17_dr25_tce","koi_disposition"]
-CSV_SAVED_FILES_LOCATION="a"
 
 
-
-#Make session specific for each users to not load bunch of CSV at once
-app.secret_key = 'your_secret_key'
-@app.before_request
-def ensure_session_id():
-    if 'session_id' not in session:
-        session['session_id'] = str(uuid4())
 
 
 
@@ -96,24 +87,6 @@ def validate_csv(file):
     return True
 
 
-#FOr file upload
-def get_session_upload_folder():
-    session_id = session.get('session_id')
-    folder = os.path.join('/tmp/uploads', session_id)
-    os.makedirs(folder, exist_ok=True)
-    return folder
-
-
-def read_file(filename):
-    folder = get_session_upload_folder()
-    filepath = os.path.join(folder, secure_filename(filename))
-    with open(filepath, 'r') as f:
-        content = f.read()
-    return content
-
-
-
-
 
 
 #Defining all routes 
@@ -130,13 +103,6 @@ def loading():
    # run_training_or_prediction()
     # When done, redirect to /simulation
     #return redirect(url_for(''))
-
-
-    file = request.files['file']
-    filename = secure_filename(file.filename)
-    folder = get_session_upload_folder()
-    filepath = os.path.join(folder, filename)
-    file.save(filepath)
 
     if "file" not in request.files:
         print("cat1")
@@ -259,5 +225,4 @@ def get_exoplanets():
             }
         }
     })
-
 
