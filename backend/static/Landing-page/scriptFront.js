@@ -68,6 +68,7 @@ exploreBtn.onclick = () => {
 quickBtn.onclick = () => {
   landingHero.style.display = "none";
   uploadSection.style.display = "none";
+  // Redirect to Flask loading route and pass dataset info
   window.location.href = "/loading?dataset=default";
 };
 
@@ -155,6 +156,7 @@ function showCustomBtnPreview(csvText) {
     <div>Preview of CSV:</div>
     ${previewHtml}
     <button id="use-custom" class="hero-btn preview-btn">Show full CSV table</button>
+    <button id="preview-next-btn" class="hero-btn preview-btn" style="margin-left: 16px;">Use This CSV</button>
   `;
   document.getElementById("use-custom").onclick = () => {
     selectedDataset = "custom";
@@ -162,6 +164,31 @@ function showCustomBtnPreview(csvText) {
     showNextBtn();
     tableArea.innerHTML = renderTable(data);
     btnArea.innerHTML = "";
+  };
+
+  // NEW BUTTON: acts like Next button
+  document.getElementById("preview-next-btn").onclick = function () {
+    const formData = new FormData();
+    formData.append(
+      "file",
+      new Blob([csvText], { type: "text/csv" }),
+      "data.csv"
+    );
+    fetch("/validate-csv", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.valid) {
+          window.location.href = "/loading?dataset=custom";
+        } else {
+          alert("CSV columns do not match expected format.");
+        }
+      })
+      .catch(() => {
+        alert("There was an error validating your CSV.");
+      });
   };
 }
 
@@ -171,40 +198,34 @@ function showNextBtn() {
 }
 
 // --- Next button logic ---
-// This version uses the function from your collaborator
 nextBtn.onclick = function () {
-  // If using the default dataset, redirect to loading with GET
+  // If using the default dataset, skip validation and go to loading
   if (selectedDataset === "default") {
     window.location.href = "/loading?dataset=default";
     return;
   }
-  // If custom, upload the file via POST to /loading
-  // This assumes fileInput.files[0] is available and valid
-  let formData = new FormData();
-  formData.append("file", fileInput.files[0]);
+  // For custom CSV, validate columns before proceeding
+  const formData = new FormData();
+  formData.append(
+    "file",
+    new Blob([customCsvText], { type: "text/csv" }),
+    "data.csv"
+  );
 
-  fetch("/loading", {
+  fetch("/validate-csv", {
     method: "POST",
-    body: formData
+    body: formData,
   })
-    .then(res => res.json())
-    .then(data => {
-      console.log(data);
-      // Optionally show a message to the user
-      // const msg = document.getElementById("error-msg");
-      // if (data.success) {
-      //   msg.style.color = "green";
-      //   msg.innerText = data.message;
-      // } else {
-      //   msg.style.color = "red";
-      //   msg.innerText = data.message;
-      // }
-      // You might want to redirect to simulation here if training is done:
-      // if (data.redirect_url) window.location.href = data.redirect_url;
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.valid) {
+        window.location.href = "/loading?dataset=custom";
+      } else {
+        alert("CSV columns do not match expected format.");
+      }
     })
-    .catch(err => {
-      console.error(err);
-      document.getElementById("error-msg").innerText = "Upload failed";
+    .catch(() => {
+      alert("There was an error validating your CSV.");
     });
 };
 
