@@ -85,10 +85,6 @@ def validate_csv(file):
 
 
 @app.route("/")
-def hello_world():
-    return render_template( "orrery.html" )
-
-@app.route("/home")
 def Landing_pagefunction():
     return render_template( "index.html" )
 
@@ -120,18 +116,17 @@ def loading():
 
 
 
+# API to call the Chatbot
 @app.route("/get")
 def get_bot_response():
     user_text = request.args.get('msg')
     return str(movie_bot.get_response(user_text))
 
 
-
-@app.route("/exoplanets")
-def get_exoplanets():
-    # test for plug and play once model is connected
-    # will just call mdodel or read database here
-    #and format here or before hand
+#API to call the Kepler model
+@app.route("/kepler_predict")
+def kepler_predict():
+    # just call model and save results in object
 
     # read csv as dataframe
     csv_data = file.read().decode('utf-8')
@@ -146,8 +141,23 @@ def get_exoplanets():
     predictions = model.predict(X)
     probabilities = model.predict_proba(X)
 
-    #converts into JSON
+    return {"ok":True, "code":200 } #status of request
 
+
+
+#simulation of planets
+@app.route("/simulation")
+def hello_world():
+    return render_template( "orrery.html" )
+
+
+@app.route("/exoplanets")
+def get_exoplanets():
+    # test for plug and play once model is connected
+    # will just call mdodel or read database here
+    #and format here or before hand
+
+    # Read CSV and converts into JSON
 
     return jsonify({
         "(2023 VD3)": {
@@ -203,3 +213,5 @@ def get_exoplanets():
             }
         }
     })
+
+
