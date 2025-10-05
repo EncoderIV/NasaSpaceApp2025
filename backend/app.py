@@ -113,8 +113,6 @@ def loading():
     if file.filename == "":
         print("cat2")
         return jsonify({"success": False, "message": "No selected file"})
-    if validate_csv(file):###push to fix loading bug
-        return redirect(url_for('loading_page'))
 
 
     # Run validation
@@ -229,6 +227,6 @@ def get_exoplanets():
     })
 
 
-@app.route("/Loading")
+@app.route("/loading")
 def loading_page():
-    return render_template( "LoadingPage.html" )
+    return render_template("loading.html" )

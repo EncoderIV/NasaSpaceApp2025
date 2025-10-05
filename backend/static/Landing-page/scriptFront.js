@@ -181,7 +181,7 @@ function showCustomBtnPreview(csvText) {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          window.location.href = "/validate_csv?dataset=custom";
+          window.location.href = "/loading";
         } else {
           alert("CSV columns do not match expected format.");
         }
