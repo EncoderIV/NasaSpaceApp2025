@@ -6,9 +6,6 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
-    <script> 
-        const FLASK_URL_FOR_EXOPLANETS = {{ url_for('get_exoplanets')}}; 
-    </script> <!--Define this dynamic url here, so shared later on with main.js to call proper API -->
 </head>
 <body>
     <canvas id="orreryCanvas"></canvas>
